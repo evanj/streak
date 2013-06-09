@@ -1,14 +1,14 @@
 Streak API for Go
 ================================
 
-An incomplete Go API wrapping [Streak's API](http://www.streak.com/api/)
+An incomplete Go API wrapping [Streak's API](http://www.streak.com/api/).
 
-Warning: this is totally incomplete. It only exposes enough for me to extract some statistics I wanted. Be prepared to extend the structs in [`streak.go`](streak.go). I'm very willing to accept pull requests!
+*Warning*: this is totally incomplete. It only exposes enough for me to extract some statistics I wanted. Be prepared to extend the structs in [`streak.go`](streak.go). I'll accept pull requests!
 
-Example Usage:
+Example:
 -----------------
 
-See [`cmd/streak_example.go`](cmd/streak_example.go) for a complete example. Snippet:
+See [`cmd/streak_example.go`](cmd/streak_example.go) for a complete working example program. Code snippet:
 
 ```go
 fmt.Println("Pipelines:")
@@ -22,3 +22,10 @@ for _, pipeline := range pipelines {
 	fmt.Printf("  .Description: %s:\n\n", pipeline.Description)
 }
 ```
+
+Example output:
+
+	Pipelines:
+		Sales / CRM:
+		.Key: agxzfm1haWxmb29nYWVyLgsSDE9yZ2FuaXphdGlvbiINbGVjdG9yaXVzLmNvbQwLEghXb3JrZmxvdxjRDww
+		.Description: Use this pipeline to manage your sales process across your organization. Create a box for each customer.
