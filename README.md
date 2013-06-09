@@ -11,5 +11,14 @@ Example Usage:
 See [`cmd/streak_example.go`](cmd/streak_example.go) for a complete example. Snippet:
 
 ```go
-
+fmt.Println("Pipelines:")
+pipelines, err := client.GetPipelines()
+if err != nil {
+	log.Fatal("Failed to get pipelines: ", err)
+}
+for _, pipeline := range pipelines {
+	fmt.Printf("  %s:\n", pipeline.Name)
+	fmt.Printf("  .Key: %s:\n", pipeline.Key)
+	fmt.Printf("  .Description: %s:\n\n", pipeline.Description)
+}
 ```
