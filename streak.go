@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/golang/glog"
 )
 
 const API_URL = "https://www.streak.com/api/v1"
@@ -66,6 +68,7 @@ func (c *Client) request(path string, outValue interface{}) error {
 	// fmt.Println(string(responseBytes))
 	err = json.Unmarshal(responseBytes, outValue)
 	if err != nil {
+		glog.Warningf("Parsing response from Streak failed; raw data: %s", string(responseBytes))
 		return err
 	}
 
