@@ -3,6 +3,7 @@ package streak
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -33,11 +34,20 @@ func TimeToTimestamp(t time.Time) int64 {
 type Client struct {
 	ApiKey     string
 	httpClient http.Client
+	baseUrl    string
 }
 
 // Returns a new Client using apiKey as the API key.
 func New(apiKey string) *Client {
-	return &Client{apiKey, http.Client{}}
+	return newWithbaseUrl(apiKey, API_URL)
+}
+
+// For testing with a different server.
+func newWithbaseUrl(apiKey string, baseUrl string) *Client {
+	if baseUrl[len(baseUrl)-1] == '/' {
+		panic("baseUrl must not end with /: " + baseUrl)
+	}
+	return &Client{apiKey, http.Client{}, baseUrl}
 }
 
 func (c *Client) request(path string, outValue interface{}) error {
@@ -46,7 +56,7 @@ func (c *Client) request(path string, outValue interface{}) error {
 	}
 
 	// Make the request and read the response
-	url := API_URL + path
+	url := c.baseUrl + path
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return err
@@ -56,6 +66,12 @@ func (c *Client) request(path string, outValue interface{}) error {
 	response, err := c.httpClient.Do(request)
 	if err != nil {
 		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		errorMessage := fmt.Sprintf("Streak HTTP request failed code: %d", response.StatusCode)
+		glog.Warning(errorMessage)
+		return errors.New(errorMessage)
 	}
 
 	responseBytes, err := ioutil.ReadAll(response.Body)

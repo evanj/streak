@@ -1,6 +1,9 @@
 package streak
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
@@ -27,4 +30,28 @@ func TestTimestampRoundUp(t *testing.T) {
 	}
 	roundTripped := TimestampToTime(TimeToTimestamp(roundUp))
 	expectEquals(t, roundUp.Truncate(time.Millisecond).Add(time.Millisecond), roundTripped)
+}
+
+// streak occasionally returns a 500 error with HTML from AppEngine
+func Test500Error(t *testing.T) {
+	// start test server
+	mux := http.NewServeMux()
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	// handle the API call
+	mux.HandleFunc("/pipelines", func(w http.ResponseWriter, r *http.Request) {
+		// Return a 500 server error
+		w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("<html><head></head><body>Error: Server Error</body></html>"))
+	})
+
+	client := newWithbaseUrl("apiKey", server.URL)
+	pipelines, err := client.GetPipelines()
+	if err == nil {
+		t.Errorf("Expected error, got pipelines: %v", pipelines)
+	} else if !strings.Contains(err.Error(), "failed code: 500") {
+		t.Errorf("Unexpected error: %v", err)
+	}
 }
